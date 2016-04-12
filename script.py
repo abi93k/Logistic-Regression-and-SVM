@@ -122,7 +122,7 @@ def blrObjFunction(initialWeights, *args):
     theta = sigmoid(np.dot(x,w))
 
     error = labeli * np.log(theta) + (1.0 - labeli) * np.log(1.0 - theta)
-    error = - * np.sum(error)/n_data
+    error = -1 * np.sum(error)/n_data
 
     error_grad = (theta - labeli) * x
     error_grad = np.sum(error_grad, axis=0)/n_data
