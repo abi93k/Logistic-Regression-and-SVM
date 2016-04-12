@@ -87,6 +87,11 @@ def preprocess():
 def sigmoid(z):
     return 1.0 / (1.0 + np.exp(-z))
 
+def softmax(z):
+   numerator = np.exp(z);
+   denominator = np.sum(numerator,axis=1);
+   return numerator/denominator;
+
 
 def blrObjFunction(initialWeights, *args):
     """
@@ -181,12 +186,14 @@ def mlrObjFunction(params, *args):
         error_grad: the vector of size (D+1) x 10 representing the gradient of
                     error function
     """
+    train_data, labeli = args
+
     n_data = train_data.shape[0]
     n_feature = train_data.shape[1]
     error = 0
     error_grad = np.zeros((n_feature + 1, n_class))
 
-    w = param.reshape((n_features+1,1))   # weights
+    w = params.reshape((n_feature+1,n_class))
 
 
     ##################
@@ -194,6 +201,16 @@ def mlrObjFunction(params, *args):
     ##################
     # HINT: Do not forget to add the bias term to your input data
 
+    x = np.hstack((np.ones((n_data,1)),train_data))
+
+    theta = softmax(np.dot(x,w))
+
+
+    error = -1 * np.sum(np.sum(np.dot(labeli,np.log(theta)))); #cross entropy
+
+    error_grad = (theta - labeli) * x 
+    error_grad = np.sum(error_grad, axis=0).flatten()
+    
     return error, error_grad
 
 
@@ -219,6 +236,13 @@ def mlrPredict(W, data):
     ##################
     # HINT: Do not forget to add the bias term to your input data
 
+    x = np.hstack((np.ones((n_data, 1)),data))
+
+    y=softmax(np.dot(x,W));
+    indices=np.argmax(axis=1);
+
+    label=indices+1
+
     return label
 
 
@@ -240,40 +264,7 @@ Y = np.zeros((n_train, n_class))
 for i in range(n_class):
     Y[:, i] = (train_label == i).astype(int).ravel()
 
-# Logistic Regression with Gradient Descent
-W = np.zeros((n_feature + 1, n_class))
-initialWeights = np.zeros((n_feature + 1, 1))
-opts = {'maxiter': 100}
-for i in range(n_class):
-    labeli = Y[:, i].reshape(n_train, 1)
-    args = (train_data, labeli)
-    nn_params = minimize(blrObjFunction, initialWeights, jac=True, args=args, method='CG', options=opts)
-    W[:, i] = nn_params.x.reshape((n_feature + 1,))
 
-# Find the accuracy on Training Dataset
-predicted_label = blrPredict(W, train_data)
-print('\n Training set Accuracy:' + str(100 * np.mean((predicted_label == train_label).astype(float))) + '%')
-
-# Find the accuracy on Validation Dataset
-predicted_label = blrPredict(W, validation_data)
-print('\n Validation set Accuracy:' + str(100 * np.mean((predicted_label == validation_label).astype(float))) + '%')
-
-# Find the accuracy on Testing Dataset
-predicted_label = blrPredict(W, test_data)
-print('\n Testing set Accuracy:' + str(100 * np.mean((predicted_label == test_label).astype(float))) + '%')
-
-"""
-Script for Support Vector Machine
-"""
-
-print('\n\n--------------SVM-------------------\n\n')
-##################
-# YOUR CODE HERE #
-##################
-
-
-"""
-Script for Extra Credit Part
 # FOR EXTRA CREDIT ONLY
 W_b = np.zeros((n_feature + 1, n_class))
 initialWeights_b = np.zeros((n_feature + 1, n_class))
@@ -294,5 +285,5 @@ print('\n Validation set Accuracy:' + str(100 * np.mean((predicted_label_b == va
 # Find the accuracy on Testing Dataset
 predicted_label_b = mlrPredict(W_b, test_data)
 print('\n Testing set Accuracy:' + str(100 * np.mean((predicted_label_b == test_label).astype(float))) + '%')
-"""
+
 
