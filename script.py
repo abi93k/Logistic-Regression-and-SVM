@@ -110,10 +110,22 @@ def blrObjFunction(initialWeights, *args):
     error = 0
     error_grad = np.zeros((n_features + 1, 1))
 
+    w = initialWeights.reshape((n_features+1,1))
+
+
     ##################
     # YOUR CODE HERE #
     ##################
     # HINT: Do not forget to add the bias term to your input data
+
+    x = np.hstack((np.ones((n_data,1)),train_data))
+    theta = sigmoid(np.dot(x,w))
+
+    error = labeli * np.log(theta) + (1.0 - labeli) * np.log(1.0 - theta)
+    error = - * np.sum(error)/n_data
+
+    error_grad = (theta - labeli) * x
+    error_grad = np.sum(error_grad, axis=0)/n_data
 
     return error, error_grad
 
@@ -133,12 +145,22 @@ def blrPredict(W, data):
          corresponding feature vector given in data matrix
 
     """
+
+    n_data = data.shape[0];
+
     label = np.zeros((data.shape[0], 1))
 
     ##################
     # YOUR CODE HERE #
     ##################
     # HINT: Do not forget to add the bias term to your input data
+
+
+    x = np.hstack((np.ones((n_data, 1)),data))
+
+    label = sigmoid(np.dot(x, W))
+    label = np.argmax(label, axis=1)
+    label = label.reshape((n_data,1))
 
     return label
 
@@ -163,6 +185,9 @@ def mlrObjFunction(params, *args):
     n_feature = train_data.shape[1]
     error = 0
     error_grad = np.zeros((n_feature + 1, n_class))
+
+    w = param.reshape((n_features+1,1))   # weights
+
 
     ##################
     # YOUR CODE HERE #
@@ -249,7 +274,6 @@ print('\n\n--------------SVM-------------------\n\n')
 
 """
 Script for Extra Credit Part
-"""
 # FOR EXTRA CREDIT ONLY
 W_b = np.zeros((n_feature + 1, n_class))
 initialWeights_b = np.zeros((n_feature + 1, n_class))
@@ -270,3 +294,5 @@ print('\n Validation set Accuracy:' + str(100 * np.mean((predicted_label_b == va
 # Find the accuracy on Testing Dataset
 predicted_label_b = mlrPredict(W_b, test_data)
 print('\n Testing set Accuracy:' + str(100 * np.mean((predicted_label_b == test_label).astype(float))) + '%')
+"""
+
