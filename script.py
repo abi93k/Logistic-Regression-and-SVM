@@ -287,7 +287,71 @@ print('\n\n--------------SVM-------------------\n\n')
 ##################
 # YOUR CODE HERE #
 ##################
+#|||The quest to finish this part of ASST3 begins|||
 
+from sklearn.svm import SVC
+
+flatten_train_label=train_label.flatten()
+
+#Parameter 1 - Linear Kernel
+
+print("\nParameter 2 - Linear Kernel \n")
+
+clf=SVC(kernel="linear")
+clf.fit(train_data,flatten_train_label) #TODO find out the second argument.
+prediction_train_label=clf.score(train_data, train_label)
+prediction_test_label=clf.score(test_data, test_label)
+prediction_validation_label=clf.score(validation_data,validation_label)
+print('\n Training set Accuracy:' + str(100 * prediction_train_label) + '%')
+print('\n Testing set Accuracy:' + str(100 * prediction_test_label) + '%')
+print('\n Validation set Accuracy:' + str(100 * prediction_validation_label) + '%')
+
+#Parameter 2 - Gamma=1
+
+print("\nParameter 2 - Gamma=1 \n")
+
+clf=SVC(gamma=1)
+clf.fit(train_data,flatten_train_label)
+prediction_train_label=clf.score(train_data, train_label)
+prediction_test_label=clf.score(test_data, test_label)
+prediction_validation_label=clf.score(validation_data,validation_label)
+
+print('\n Training set Accuracy:' + str(100 * prediction_train_label) + '%')
+print('\n Testing set Accuracy:' + str(100 * prediction_test_label) + '%')
+print('\n Validation set Accuracy:' + str(100 * prediction_validation_label) + '%')
+
+#Parameter 3 - Gamma=def
+
+print("\nParameter 3 - Gamma=Default \n")
+
+clf=SVC()
+clf.fit(train_data,flatten_train_label)
+prediction_train_label=clf.score(train_data, train_label)
+prediction_test_label=clf.score(test_data, test_label)
+prediction_validation_label=clf.score(validation_data,validation_label)
+
+print('\n Training set Accuracy:' + str(100 * prediction_train_label) + '%')
+print('\n Testing set Accuracy:' + str(100 * prediction_test_label) + '%')
+print('\n Validation set Accuracy:' + str(100 * prediction_validation_label) + '%')
+
+#Parameter 4 - C Value =[1 To 100]
+
+aList = [1,10,20,30,40,50,60,70,80,90,100]
+
+for i in aList:    
+    print("\nParameter 4- C="+i+" \n")
+
+    clf=SVC(C=i)
+    clf.fit(train_data,flatten_train_label)
+    prediction_train_label=clf.score(train_data, train_label)
+    prediction_test_label=clf.score(test_data, test_label)
+    prediction_validation_label=clf.score(validation_data,validation_label)
+
+    print('\n Training set Accuracy:' + str(100 * prediction_train_label) + '%')
+    print('\n Testing set Accuracy:' + str(100 * prediction_test_label) + '%')
+    print('\n Validation set Accuracy:' + str(100 * prediction_validation_label) + '%')
+
+#|||The quest has ended|||
 
 """
 Script for Extra Credit Part
