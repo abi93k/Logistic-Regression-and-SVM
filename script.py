@@ -92,7 +92,8 @@ def sigmoid(z):
 
 def softmax(z):
    numerator = np.exp(z);
-   denominator = np.sum(numerator,axis=0);
+   denominator = np.sum(numerator,axis=1);
+   denominator = denominator.reshape((numerator.shape[0],1))
    return numerator/denominator;
 
 
@@ -120,17 +121,12 @@ def blrObjFunction(initialWeights, *args):
 
     w = initialWeights.reshape((n_features+1,1))
 
-
-    ##################
-    # YOUR CODE HERE #
-    ##################
-    # HINT: Do not forget to add the bias term to your input data
-
     x = np.hstack((np.ones((n_data,1)),train_data))
     theta = sigmoid(np.dot(x,w))
 
     error = labeli * np.log(theta) + (1.0 - labeli) * np.log(1.0 - theta)
-    error = -1 * np.sum(error)/n_data
+    error = -1 * np.sum(error)
+    error = error/n_data
 
     error_grad = (theta - labeli) * x
     error_grad = np.sum(error_grad, axis=0)/n_data
@@ -156,13 +152,7 @@ def blrPredict(W, data):
 
     n_data = data.shape[0];
 
-    label = np.zeros((data.shape[0], 1))
-
-    ##################
-    # YOUR CODE HERE #
-    ##################
-    # HINT: Do not forget to add the bias term to your input data
-
+    label = np.zeros((n_data, 1))
 
     x = np.hstack((np.ones((n_data, 1)),data))
 
@@ -206,16 +196,11 @@ def mlrObjFunction(params, *args):
 
     x = np.hstack((np.ones((n_data,1)),train_data))
 
-    val = np.dot(x,w)
-    numerator = np.exp(val)
-    denominator = np.sum(numerator, axis=1)
-    denominator = denominator.reshape((numerator.shape[0],1))
-    theta = numerator/denominator
+    theta = softmax(np.dot(x,w))
 
     error = np.sum(np.sum(labeli*np.log(theta),axis=1),axis=0)
     error = (-1.0) * error
     error = (error/float(x.shape[0]))
-    print(error)
 
     error_grad = np.subtract(theta,labeli)
     error_grad = np.dot(error_grad.T,x).T
@@ -252,16 +237,13 @@ def mlrPredict(W, data):
 
     x = np.hstack((np.ones((n_data, 1)),data))
 
-    val = np.dot(x,W)
-    numerator = np.exp(val)
-    denominator = np.sum(numerator, axis=1)
-    denominator = denominator.reshape((numerator.shape[0],1))
-    theta = numerator/denominator
+    theta = softmax(np.dot(x,W))
 
     label = np.argmax(theta,axis=1);
     label = label.reshape((n_data,1))
     
     return label
+
 
 
 """
@@ -282,7 +264,41 @@ Y = np.zeros((n_train, n_class))
 for i in range(n_class):
     Y[:, i] = (train_label == i).astype(int).ravel()
 
+# Logistic Regression with Gradient Descent
+W = np.zeros((n_feature + 1, n_class))
+initialWeights = np.zeros((n_feature + 1, 1))
+opts = {'maxiter': 100}
+for i in range(n_class):
+    labeli = Y[:, i].reshape(n_train, 1)
+    args = (train_data, labeli)
+    nn_params = minimize(blrObjFunction, initialWeights, jac=True, args=args, method='CG', options=opts)
+    W[:, i] = nn_params.x.reshape((n_feature + 1,))
 
+# Find the accuracy on Training Dataset
+predicted_label = blrPredict(W, train_data)
+print('\n Training set Accuracy:' + str(100 * np.mean((predicted_label == train_label).astype(float))) + '%')
+
+# Find the accuracy on Validation Dataset
+predicted_label = blrPredict(W, validation_data)
+print('\n Validation set Accuracy:' + str(100 * np.mean((predicted_label == validation_label).astype(float))) + '%')
+
+# Find the accuracy on Testing Dataset
+predicted_label = blrPredict(W, test_data)
+print('\n Testing set Accuracy:' + str(100 * np.mean((predicted_label == test_label).astype(float))) + '%')
+exit()
+"""
+Script for Support Vector Machine
+"""
+
+print('\n\n--------------SVM-------------------\n\n')
+##################
+# YOUR CODE HERE #
+##################
+
+
+"""
+Script for Extra Credit Part
+"""
 # FOR EXTRA CREDIT ONLY
 W_b = np.zeros((n_feature + 1, n_class))
 initialWeights_b = np.zeros((n_feature + 1, n_class))
@@ -303,5 +319,3 @@ print('\n Validation set Accuracy:' + str(100 * np.mean((predicted_label_b == va
 # Find the accuracy on Testing Dataset
 predicted_label_b = mlrPredict(W_b, test_data)
 print('\n Testing set Accuracy:' + str(100 * np.mean((predicted_label_b == test_label).astype(float))) + '%')
-
-
