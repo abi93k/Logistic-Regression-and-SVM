@@ -189,10 +189,7 @@ def mlrObjFunction(params, *args):
     w = params.reshape((n_feature+1,n_class))
 
 
-    ##################
-    # YOUR CODE HERE #
-    ##################
-    # HINT: Do not forget to add the bias term to your input data
+
 
     x = np.hstack((np.ones((n_data,1)),train_data))
 
@@ -230,10 +227,6 @@ def mlrPredict(W, data):
     label = np.zeros((data.shape[0], 1))
     n_data = data.shape[0];
 
-    ##################
-    # YOUR CODE HERE #
-    ##################
-    # HINT: Do not forget to add the bias term to your input data
 
     x = np.hstack((np.ones((n_data, 1)),data))
 
@@ -285,7 +278,7 @@ print('\n Validation set Accuracy:' + str(100 * np.mean((predicted_label == vali
 # Find the accuracy on Testing Dataset
 predicted_label = blrPredict(W, test_data)
 print('\n Testing set Accuracy:' + str(100 * np.mean((predicted_label == test_label).astype(float))) + '%')
-exit()
+
 """
 Script for Support Vector Machine
 """
