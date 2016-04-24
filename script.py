@@ -1,6 +1,9 @@
 import numpy as np
+import numpy.matlib
 from scipy.io import loadmat
 from scipy.optimize import minimize
+from scipy.misc import logsumexp
+
 
 
 def preprocess():
@@ -89,7 +92,7 @@ def sigmoid(z):
 
 def softmax(z):
    numerator = np.exp(z);
-   denominator = np.sum(numerator,axis=1);
+   denominator = np.sum(numerator,axis=0);
    return numerator/denominator;
 
 
@@ -203,14 +206,24 @@ def mlrObjFunction(params, *args):
 
     x = np.hstack((np.ones((n_data,1)),train_data))
 
-    theta = softmax(np.dot(x,w))
+    val = np.dot(x,w)
+    numerator = np.exp(val)
+    denominator = np.sum(numerator, axis=1)
+    denominator = denominator.reshape((numerator.shape[0],1))
+    theta = numerator/denominator
+
+    error = np.sum(np.sum(labeli*np.log(theta),axis=1),axis=0)
+    error = (-1.0) * error
+    error = (error/float(x.shape[0]))
+    print(error)
+
+    error_grad = np.subtract(theta,labeli)
+    error_grad = np.dot(error_grad.T,x).T
+    error_grad = error_grad/x.shape[0]
+    error_grad = error_grad.flatten()
+ 
 
 
-    error = -1 * np.sum(np.sum(np.dot(labeli,np.log(theta)))); #cross entropy
-
-    error_grad = (theta - labeli) * x 
-    error_grad = np.sum(error_grad, axis=0).flatten()
-    
     return error, error_grad
 
 
@@ -230,6 +243,7 @@ def mlrPredict(W, data):
 
     """
     label = np.zeros((data.shape[0], 1))
+    n_data = data.shape[0];
 
     ##################
     # YOUR CODE HERE #
@@ -238,11 +252,15 @@ def mlrPredict(W, data):
 
     x = np.hstack((np.ones((n_data, 1)),data))
 
-    y=softmax(np.dot(x,W));
-    indices=np.argmax(axis=1);
+    val = np.dot(x,W)
+    numerator = np.exp(val)
+    denominator = np.sum(numerator, axis=1)
+    denominator = denominator.reshape((numerator.shape[0],1))
+    theta = numerator/denominator
 
-    label=indices+1
-
+    label = np.argmax(theta,axis=1);
+    label = label.reshape((n_data,1))
+    
     return label
 
 
