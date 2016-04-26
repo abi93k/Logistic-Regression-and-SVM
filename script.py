@@ -3,8 +3,7 @@ import numpy.matlib
 from scipy.io import loadmat
 from scipy.optimize import minimize
 from scipy.misc import logsumexp
-
-
+from sklearn.svm import SVC
 
 def preprocess():
     """ 
@@ -95,7 +94,6 @@ def softmax(z):
    denominator = np.sum(numerator,axis=1);
    denominator = denominator.reshape((numerator.shape[0],1))
    return numerator/denominator;
-
 
 def blrObjFunction(initialWeights, *args):
     """
@@ -188,26 +186,20 @@ def mlrObjFunction(params, *args):
 
     w = params.reshape((n_feature+1,n_class))
 
-
-
-
     x = np.hstack((np.ones((n_data,1)),train_data))
 
     theta = softmax(np.dot(x,w))
 
-    error = np.sum(np.sum(labeli*np.log(theta),axis=1),axis=0)
+    error = np.sum(labeli*np.log(theta))
     error = (-1.0) * error
-    error = (error/float(x.shape[0]))
+    error = (error/x.shape[0])
 
     error_grad = np.subtract(theta,labeli)
     error_grad = np.dot(error_grad.T,x).T
-    error_grad = error_grad/x.shape[0]
+    error_grad = error_grad/n_data
     error_grad = error_grad.flatten()
- 
-
-
+    
     return error, error_grad
-
 
 def mlrPredict(W, data):
     """
@@ -227,7 +219,6 @@ def mlrPredict(W, data):
     label = np.zeros((data.shape[0], 1))
     n_data = data.shape[0];
 
-
     x = np.hstack((np.ones((n_data, 1)),data))
 
     theta = softmax(np.dot(x,W))
@@ -237,11 +228,11 @@ def mlrPredict(W, data):
     
     return label
 
-
-
 """
 Script for Logistic Regression
 """
+print('\n\n--------------BLR-------------------\n\n')
+
 train_data, train_label, validation_data, validation_label, test_data, test_label = preprocess()
 
 # number of classes
@@ -269,93 +260,75 @@ for i in range(n_class):
 
 # Find the accuracy on Training Dataset
 predicted_label = blrPredict(W, train_data)
-print('\n Training set Accuracy:' + str(100 * np.mean((predicted_label == train_label).astype(float))) + '%')
+print('Training set Accuracy:' + str(100 * np.mean((predicted_label == train_label).astype(float))) + '%')
 
 # Find the accuracy on Validation Dataset
 predicted_label = blrPredict(W, validation_data)
-print('\n Validation set Accuracy:' + str(100 * np.mean((predicted_label == validation_label).astype(float))) + '%')
+print('Validation set Accuracy:' + str(100 * np.mean((predicted_label == validation_label).astype(float))) + '%')
 
 # Find the accuracy on Testing Dataset
 predicted_label = blrPredict(W, test_data)
-print('\n Testing set Accuracy:' + str(100 * np.mean((predicted_label == test_label).astype(float))) + '%')
+print('Testing set Accuracy:' + str(100 * np.mean((predicted_label == test_label).astype(float))) + '%')
 
 """
 Script for Support Vector Machine
 """
 
 print('\n\n--------------SVM-------------------\n\n')
-##################
-# YOUR CODE HERE #
-##################
-#|||The quest to finish this part of ASST3 begins|||
-
-from sklearn.svm import SVC
 
 flatten_train_label=train_label.flatten()
 
-#Parameter 1 - Linear Kernel
-
-print("\nParameter 2 - Linear Kernel \n")
+print("\nLinear Kernel \n")
 
 clf=SVC(kernel="linear")
-clf.fit(train_data,flatten_train_label) #TODO find out the second argument.
-prediction_train_label=clf.score(train_data, train_label)
-prediction_test_label=clf.score(test_data, test_label)
-prediction_validation_label=clf.score(validation_data,validation_label)
-print('\n Training set Accuracy:' + str(100 * prediction_train_label) + '%')
-print('\n Testing set Accuracy:' + str(100 * prediction_test_label) + '%')
-print('\n Validation set Accuracy:' + str(100 * prediction_validation_label) + '%')
+clf.fit(train_data,flatten_train_label)
+train_acc=clf.score(train_data, train_label)
+val_acc=clf.score(validation_data,validation_label)
+test_acc=clf.score(test_data, test_label)
+print('Training set Accuracy:' + str(100 * train_acc) + '%')
+print('Validation set Accuracy:' + str(100 * val_acc) + '%')
+print('Testing set Accuracy:' + str(100 * test_acc) + '%')
 
-#Parameter 2 - Gamma=1
-
-print("\nParameter 2 - Gamma=1 \n")
+print("\nRBF Kernel - Gamma = 1 \n")
 
 clf=SVC(gamma=1)
 clf.fit(train_data,flatten_train_label)
-prediction_train_label=clf.score(train_data, train_label)
-prediction_test_label=clf.score(test_data, test_label)
-prediction_validation_label=clf.score(validation_data,validation_label)
+train_acc=clf.score(train_data, train_label)
+val_acc=clf.score(validation_data,validation_label)
+test_acc=clf.score(test_data, test_label)
+print('Training set Accuracy:' + str(100 * train_acc) + '%')
+print('Validation set Accuracy:' + str(100 * val_acc) + '%')
+print('Testing set Accuracy:' + str(100 * test_acc) + '%')
 
-print('\n Training set Accuracy:' + str(100 * prediction_train_label) + '%')
-print('\n Testing set Accuracy:' + str(100 * prediction_test_label) + '%')
-print('\n Validation set Accuracy:' + str(100 * prediction_validation_label) + '%')
-
-#Parameter 3 - Gamma=def
-
-print("\nParameter 3 - Gamma=Default \n")
+print("\nRBF Kernel - Gamma = 0 \n")
 
 clf=SVC()
 clf.fit(train_data,flatten_train_label)
-prediction_train_label=clf.score(train_data, train_label)
-prediction_test_label=clf.score(test_data, test_label)
-prediction_validation_label=clf.score(validation_data,validation_label)
+train_acc=clf.score(train_data, train_label)
+val_acc=clf.score(validation_data,validation_label)
+test_acc=clf.score(test_data, test_label)
+print('Training set Accuracy:' + str(100 * train_acc) + '%')
+print('Validation set Accuracy:' + str(100 * val_acc) + '%')
+print('Testing set Accuracy:' + str(100 * test_acc) + '%')
 
-print('\n Training set Accuracy:' + str(100 * prediction_train_label) + '%')
-print('\n Testing set Accuracy:' + str(100 * prediction_test_label) + '%')
-print('\n Validation set Accuracy:' + str(100 * prediction_validation_label) + '%')
+c_list = [1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 
-#Parameter 4 - C Value =[1 To 100]
-
-aList = [1,10,20,30,40,50,60,70,80,90,100]
-
-for i in aList:    
-    print("\nParameter 4- C="+i+" \n")
-
-    clf=SVC(C=i)
+for c in c_list:    
+    print("\nRBF Kernel - Gamma = 0 & C = "+str(c)+" \n")
+    clf=SVC(C=c)
     clf.fit(train_data,flatten_train_label)
-    prediction_train_label=clf.score(train_data, train_label)
-    prediction_test_label=clf.score(test_data, test_label)
-    prediction_validation_label=clf.score(validation_data,validation_label)
-
-    print('\n Training set Accuracy:' + str(100 * prediction_train_label) + '%')
-    print('\n Testing set Accuracy:' + str(100 * prediction_test_label) + '%')
-    print('\n Validation set Accuracy:' + str(100 * prediction_validation_label) + '%')
-
-#|||The quest has ended|||
+    train_acc=clf.score(train_data, train_label)
+    val_acc=clf.score(validation_data,validation_label)
+    test_acc=clf.score(test_data, test_label)
+    print('Training set Accuracy:' + str(100 * train_acc) + '%')
+    print('Validation set Accuracy:' + str(100 * val_acc) + '%')
+    print('Testing set Accuracy:' + str(100 * test_acc) + '%')
 
 """
 Script for Extra Credit Part
 """
+print('\n\n--------------MLR-------------------\n\n')
+
 # FOR EXTRA CREDIT ONLY
 W_b = np.zeros((n_feature + 1, n_class))
 initialWeights_b = np.zeros((n_feature + 1, n_class))
@@ -367,12 +340,12 @@ W_b = nn_params.x.reshape((n_feature + 1, n_class))
 
 # Find the accuracy on Training Dataset
 predicted_label_b = mlrPredict(W_b, train_data)
-print('\n Training set Accuracy:' + str(100 * np.mean((predicted_label_b == train_label).astype(float))) + '%')
+print('Training set Accuracy:' + str(100 * np.mean((predicted_label_b == train_label).astype(float))) + '%')
 
 # Find the accuracy on Validation Dataset
 predicted_label_b = mlrPredict(W_b, validation_data)
-print('\n Validation set Accuracy:' + str(100 * np.mean((predicted_label_b == validation_label).astype(float))) + '%')
+print('Validation set Accuracy:' + str(100 * np.mean((predicted_label_b == validation_label).astype(float))) + '%')
 
 # Find the accuracy on Testing Dataset
 predicted_label_b = mlrPredict(W_b, test_data)
-print('\n Testing set Accuracy:' + str(100 * np.mean((predicted_label_b == test_label).astype(float))) + '%')
+print('Testing set Accuracy:' + str(100 * np.mean((predicted_label_b == test_label).astype(float))) + '%')
