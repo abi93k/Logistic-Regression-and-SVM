@@ -273,7 +273,7 @@ print('Testing set Accuracy:' + str(100 * np.mean((predicted_label == test_label
 
 """
 Script for Support Vector Machine
-
+"""
 
 print('\n\n--------------SVM-------------------\n\n')
 
@@ -324,7 +324,7 @@ for c in c_list:
     print('Training set Accuracy:' + str(100 * train_acc) + '%')
     print('Validation set Accuracy:' + str(100 * val_acc) + '%')
     print('Testing set Accuracy:' + str(100 * test_acc) + '%')
-"""
+
 """
 Script for Extra Credit Part
 """
@@ -353,8 +353,9 @@ print('Testing set Accuracy:' + str(100 * np.mean((predicted_label_b == test_lab
 
 """
 Dumping BLR & MLR weights to pickle file
-"""
+
 with open('params.pickle', 'wb') as f1: 
     pickle.dump(W, f1) 
 with open('params_bonus.pickle', 'wb') as f2:
     pickle.dump(W_b, f2)
+"""
