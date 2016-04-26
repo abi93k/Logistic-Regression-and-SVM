@@ -249,16 +249,7 @@ Y = np.zeros((n_train, n_class))
 for i in range(n_class):
     Y[:, i] = (train_label == i).astype(int).ravel()
 
-# Logistic Regression with Gradient Descent
-W = np.zeros((n_feature + 1, n_class))
-initialWeights = np.zeros((n_feature + 1, 1))
-opts = {'maxiter': 100}
-for i in range(n_class):
-    labeli = Y[:, i].reshape(n_train, 1)
-    args = (train_data, labeli)
-    nn_params = minimize(blrObjFunction, initialWeights, jac=True, args=args, method='CG', options=opts)
-    W[:, i] = nn_params.x.reshape((n_feature + 1,))
-
+W = pickle.load(open('params.pickle', 'rb'))
 # Find the accuracy on Training Dataset
 predicted_label = blrPredict(W, train_data)
 print('Training set Accuracy:' + str(100 * np.mean((predicted_label == train_label).astype(float))) + '%')
@@ -331,13 +322,8 @@ Script for Extra Credit Part
 print('\n\n--------------MLR-------------------\n\n')
 
 # FOR EXTRA CREDIT ONLY
-W_b = np.zeros((n_feature + 1, n_class))
-initialWeights_b = np.zeros((n_feature + 1, n_class))
-opts_b = {'maxiter': 100}
 
-args_b = (train_data, Y)
-nn_params = minimize(mlrObjFunction, initialWeights_b, jac=True, args=args_b, method='CG', options=opts_b)
-W_b = nn_params.x.reshape((n_feature + 1, n_class))
+W_b = pickle.load(open('params_bonus.pickle', 'rb'))
 
 # Find the accuracy on Training Dataset
 predicted_label_b = mlrPredict(W_b, train_data)
@@ -351,10 +337,3 @@ print('Validation set Accuracy:' + str(100 * np.mean((predicted_label_b == valid
 predicted_label_b = mlrPredict(W_b, test_data)
 print('Testing set Accuracy:' + str(100 * np.mean((predicted_label_b == test_label).astype(float))) + '%')
 
-"""
-Dumping BLR & MLR weights to pickle file
-"""
-with open('params.pickle', 'wb') as f1: 
-    pickle.dump(W, f1) 
-with open('params_bonus.pickle', 'wb') as f2:
-    pickle.dump(W_b, f2)
